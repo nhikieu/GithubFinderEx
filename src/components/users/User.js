@@ -2,16 +2,20 @@ import React, { Fragment, Component } from "react";
 import { Spinner } from "reactstrap";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import Repos from "../repos/Repos";
 
 export class User extends Component {
   componentDidMount() {
     this.props.getUser(this.props.match.params.login);
+    this.props.getUserRepos(this.props.match.params.login);
   }
 
   static propTypes = {
     loading: PropTypes.bool.isRequired,
     user: PropTypes.object.isRequired,
-    getUser: PropTypes.func.isRequired
+    repos: PropTypes.array.isRequired,
+    getUser: PropTypes.func.isRequired,
+    getUserRepos: PropTypes.func.isRequired
   };
 
   render() {
@@ -24,17 +28,16 @@ export class User extends Component {
       login,
       html_url,
       company,
-      folowers,
+      followers,
       following,
       public_repos,
       public_gists,
       hireable
     } = this.props.user;
 
-    const { loading } = this.props;
+    const { loading, repos } = this.props;
 
     if (loading) return <Spinner color="primary" />;
-
     return (
       <Fragment>
         <div className="row">
@@ -73,12 +76,43 @@ export class User extends Component {
               <a className="mb-3 btn btn-dark" href={html_url}>
                 Visit Github Profile
               </a>
-              <p>Username: {login}</p>
-              <p>Company: {company}</p>
-              <p>Website: {blog}</p>
+              <ul className="pl-0" style={{ listStyle: "none" }}>
+                {login && (
+                  <li>
+                    <strong>Username: {login}</strong>
+                  </li>
+                )}
+                {company && (
+                  <li>
+                    <strong>Company: {company}</strong>
+                  </li>
+                )}
+                {blog && (
+                  <li>
+                    <strong>Website: {blog}</strong>
+                  </li>
+                )}
+              </ul>
             </div>
           </div>
         </div>
+        <div className="my-3 card">
+          <div className="card-body">
+            <div className="mx-3 badge badge-primary">
+              Followers: {followers}
+            </div>
+            <div className="mx-3 badge badge-danger">
+              Following: {following}
+            </div>
+            <div className="mx-3 badge badge-warning">
+              Public Repos: {public_repos}
+            </div>
+            <div className="mx-3 badge badge-info">
+              Public Gists: {public_gists}
+            </div>
+          </div>
+        </div>
+        <Repos repos={repos} />
       </Fragment>
     );
   }
